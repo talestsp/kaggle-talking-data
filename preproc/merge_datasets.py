@@ -5,7 +5,7 @@ import gc
 working_dir = "/home/tales/development/kaggle-talking-data/"
 chdir(working_dir)
 
-dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "app_id": long, "is_installed": str,  "is_active": str, "gender": str ,"age": int, "group": str, "gender": str, "age": int, "group": str}
+dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "app_id": long, "is_installed": str,  "is_active": str, "gender": str ,"age": int, "group": str, "group": str}
 
 app_labels = pd.read_csv("data/app_labels.csv", dtype=dtypes)
 len(app_labels)
