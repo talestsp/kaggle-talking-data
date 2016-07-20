@@ -1,11 +1,16 @@
 options(scipen = 999)
 
-app.labels = read.csv("~/development/talking-data/data/app_labels.csv")
-label.categ = read.csv("~/development/talking-data/data/label_categories.csv")
-app.events = read.csv("~/development/talking-data/data/app_events.csv")
+setwd("~/development/kaggle-talking-data/")
 
-events = read.csv("~/development/talking-data/data/events.csv")
+app.labels = read.csv("data/app_labels.csv")
+label.categ = read.csv("data/label_categories.csv")
 
 # app.labels
 app.categ = merge(x = app.labels, y = label.categ, by = "label_id")
-app.labels.freq = data.frame(sort(table(app.categ$category), decreasing = T))
+app.categ$label_id = NULL
+
+#analyzing repeated rows
+rep.app.labels.freq = table(paste(paste(app.labels$app_id, app.labels$label_id)))
+rep.app.labels.freq = data.frame(sort(rep.app.labels.freq, decreasing = T))
+head(rep.app.labels.freq)
+
