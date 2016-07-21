@@ -4,7 +4,7 @@ import gc
 
 ####################################################### Load Data ####################################################### 
 
-working_dir = "/home/henrique/DataScience/talking_data"
+working_dir = "/home/tales/development/talking_data"
 chdir(working_dir)
 
 dtypes = {"event_id": int, "device_id": str, "timestamp": str, "longitude": float, "latitude": float}

@@ -24,23 +24,6 @@ fill.with.zeros <- function(tab){
   table.df
 }
 
-plot.freq.over.time <- function(column, title){
-  title = unique(title)
-  freq = table(round(column))
-  freq.relative = freq / length(column)
-
-  freq.relative = fill.with.zeros(freq.relative)
-  colnames(freq.relative) = c("hour", "freq")
-  
-  #sorting by hour label
-  freq.relative$hour = as.numeric(freq.relative$hour)
-  freq.relative$freq = as.numeric(freq.relative$freq)
-  freq.relative = freq.relative[with(freq.relative, order(hour)), ]
-  print (freq.relative)
-
-  barplot(height = freq.relative$freq, names.arg = freq.relative$hour, col = "lightgreen", main = title, ylim = c(0,1))
-}
-
 ##### LOADING #####
 evts.classes = c("integer", "factor", "character", "numeric", "numeric")
 evts = read.csv("data/events.csv", colClasses = evts.classes)
@@ -59,12 +42,20 @@ evts.gnda$time.decimal = time.to.decimal(evts.gnda$timestamp)
 
 ##### PLOTTING EVENTS BY AGE OVER TIME #####
 
-#remove rows with no age information
+#removing age == NA
 evts.gnda = evts.gnda[! is.na(evts.gnda$age),]
-#using data.table for the following grouping plot
-evts.gnda = data.table(evts.gnda)
-setkey(evts.gnda, age)
-#grouping plot
-plots = evts.gnda[, plot.freq.over.time(time.decimal, age), by = age]
+
+for (i in sort(unique(evts.gnda$age))){
+  #barplot(table(evts.gnda$time.decimal), names.arg = i)
+  print (i)
+  data = evts.gnda[evts.gnda$age == i,]
+  round.time = round( data$time.decimal )
+  tab = sort(table(round.time), decreasing = T)
+  print (tab)
+  print ("---")
+  print ("")
+}
+
+
 
 
