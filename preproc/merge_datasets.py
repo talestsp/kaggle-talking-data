@@ -2,7 +2,7 @@ import pandas as pd
 from os import chdir
 import gc
 
-working_dir = "/home/tales/development/kaggle-talking-data/"
+working_dir = "/home/tales/dev/kaggle-talking-data/"
 chdir(working_dir)
 
 dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "app_id": long, "is_installed": str,  "is_active": str, "gender": str ,"age": int, "group": str, "group": str}
@@ -52,7 +52,7 @@ gender_age.head()
 app_events = pd.merge(app_events, gender_age, on='device_id', how='left')
 app_events.head()
 
-phone_brand = pd.read_csv("data/phone_brand_device_model.csv", dtype=dtypes)
+phone_brand = pd.read_csv("data/phone_brand_device_model_translated.csv", dtype=dtypes)
 app_events = pd.merge(app_events, phone_brand, on='device_id', how='left')
 del app_events['device_id']
 gender_age = None
