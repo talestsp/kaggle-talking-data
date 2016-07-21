@@ -1,4 +1,6 @@
-setwd("~/dev/kaggle-talking-data")
+library("data.table")
+
+setwd("~/development/kaggle-talking-data")
 
 ##### FUNCTIONS #####
 time.to.decimal <- function(time){
@@ -11,11 +13,32 @@ time.to.decimal <- function(time){
   time_decimal
 }
 
+fill.with.zeros <- function(tab){
+  table.df = data.frame(tab)
+  keys = table.df$Var1
+  for (i in 0:23){
+    if (! is.element(i, keys)){
+      table.df = rbind(table.df, data.frame("Var1"=as.character(i), "Freq"=0))
+    }
+  }
+  table.df
+}
+
 plot.freq.over.time <- function(column, title){
   title = unique(title)
   freq = table(round(column))
   freq.relative = freq / length(column)
-  barplot(freq.relative, col = "lightgreen", main = title, ylim = c(0,1))
+
+  freq.relative = fill.with.zeros(freq.relative)
+  colnames(freq.relative) = c("hour", "freq")
+  
+  #sorting by hour label
+  freq.relative$hour = as.numeric(freq.relative$hour)
+  freq.relative$freq = as.numeric(freq.relative$freq)
+  freq.relative = freq.relative[with(freq.relative, order(hour)), ]
+  print (freq.relative)
+
+  barplot(height = freq.relative$freq, names.arg = freq.relative$hour, col = "lightgreen", main = title, ylim = c(0,1))
 }
 
 ##### LOADING #####
@@ -34,18 +57,14 @@ gc()
 
 evts.gnda$time.decimal = time.to.decimal(evts.gnda$timestamp)
 
-evts.gnda$timestamp = NULL
-gc()
-
 ##### PLOTTING EVENTS BY AGE OVER TIME #####
-aggregate(time.decimal ~ age, evts.gnda[! is.na(evts.gnda$age),], plot.freq.over.time)
 
-
-evts.age.clean = evts.gnda[! is.na(evts.gnda$age),]
-evts.age.clean = data.table(evts.age.clean)
-setkey(evts.age.clean, age)
-#aggregating - recommending
-plots = evts.age.clean[, plot.freq.over.time(time.decimal, age), by = age]
-
+#remove rows with no age information
+evts.gnda = evts.gnda[! is.na(evts.gnda$age),]
+#using data.table for the following grouping plot
+evts.gnda = data.table(evts.gnda)
+setkey(evts.gnda, age)
+#grouping plot
+plots = evts.gnda[, plot.freq.over.time(time.decimal, age), by = age]
 
 
