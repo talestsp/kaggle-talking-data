@@ -4,7 +4,7 @@ import gc
 
 ####################################################### Load Data ####################################################### 
 
-working_dir = "/home/tales/development/talking_data"
+working_dir = "/home/henrique/DataScience/talking_data"
 chdir(working_dir)
 
 dtypes = {"event_id": int, "device_id": str, "timestamp": str, "longitude": float, "latitude": float}
@@ -50,5 +50,5 @@ events = events.sort_values(['event_id'], ascending=True)
 
 ####################################################### Save Data ####################################################### 
 
-events.to_csv("data_files_ready/events_ready.csv", sep = ",", index=False)
+events.to_csv("data_files_ready/events_ready.csv", sep = ";", index=False)
 

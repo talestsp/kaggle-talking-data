@@ -345,7 +345,7 @@ app_labels = apps[["app_id", "general_groups_num"]]
 
 app_labels.columns = ["app_id", "label_id"]
 
-app_labels.to_csv("data_files_ready/app_labels_ready.csv", sep = ",", index=False)
+app_labels.to_csv("data_files_ready/app_labels_ready.csv", sep = ";", index=False)
 
 app_labels.head()
 
