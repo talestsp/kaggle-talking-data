@@ -335,13 +335,17 @@ label_categories = label_categories.drop_duplicates()
 
 label_categories = label_categories.sort_values(['general_groups_num'], ascending=True)
 
-label_categories.columns = ['label_id', 'label_categories']
+label_categories.columns = ["label_id", "label_categories"]
 
 label_categories.to_csv("data_files_ready/label_categories_ready.csv", sep = ",", index=False)
 
 ####################################################### Create New app_labels.csv ####################################################### 
 
-app_labels = apps[["app_id", "label_id"]]
+app_labels = apps[["app_id", "general_groups_num"]]
+
+app_labels.columns = ["app_id", "label_id"]
 
 app_labels.to_csv("data_files_ready/app_labels_ready.csv", sep = ",", index=False)
+
+app_labels.head()
 
