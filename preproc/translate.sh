@@ -60,3 +60,10 @@ sed -i 's/酷派/coolpad/g' phone_brand_device_model_translated.csv
 sed -i 's/金立/gionee/g' phone_brand_device_model_translated.csv
 sed -i 's/中兴/zte/g' phone_brand_device_model_translated.csv
 sed -i 's/索尼/sony_china/g' phone_brand_device_model_translated.csv
+sed -i 's/奇酷/qiku/g' phone_brand_device_model_translated.csv
+sed -i 's/酷比/cube/g' phone_brand_device_model_translated.csv
+sed -i 's/亿通/eton/g' phone_brand_device_model_translated.csv
+sed -i 's/百立丰/lephone/g' phone_brand_device_model_translated.csv
+sed -i 's/欧博信/opsson/g' phone_brand_device_model_translated.csv
+sed -i 's/康佳/konka/g' phone_brand_device_model_translated.csv
+sed -i 's/诺亚信/noain/g' phone_brand_device_model_translated.csv
