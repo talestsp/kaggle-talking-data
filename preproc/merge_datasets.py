@@ -54,7 +54,6 @@ app_events.head()
 
 phone_brand = pd.read_csv("data/phone_brand_device_model_translated.csv", dtype=dtypes)
 app_events = pd.merge(app_events, phone_brand, on='device_id', how='left')
-del app_events['device_id']
 gender_age = None
 phone_brand = None
 gc.collect()
