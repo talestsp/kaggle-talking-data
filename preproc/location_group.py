@@ -26,9 +26,10 @@ def save_group_frequencies(df_groupby, gender_age_factors):
 		print
 		
 		rows.append(row)
-		freq_df = pd.DataFrame(rows)
-		freq_df.columns = ["lon", "lat", "F23-", "F24-26", "F27-28", "F29-32", "F33-42", "F43+", "M22-", "M23-26", "M27-28", "M29-31", "M32-38", "M39+", "total"]
-		freq_df.to_csv("data/location_group.csv", index=False, sep=";")
+
+	freq_df = pd.DataFrame(rows)
+	freq_df.columns = ["lon", "lat", "F23-", "F24-26", "F27-28", "F29-32", "F33-42", "F43+", "M22-", "M23-26", "M27-28", "M29-31", "M32-38", "M39+", "total"]
+	freq_df.to_csv("data/location_group.csv", index=False, sep=";")
 
 #csv layout
 #lon, lat, F23-, F24-26, F27-28, F29-32, F33-42, F43+, M22-, M23-26, M27-28, M29-31, M32-38, M39+, total
