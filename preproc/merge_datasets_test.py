@@ -13,7 +13,7 @@ dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "
 
 events = pd.read_csv("data/events.csv", dtype=dtypes)
 
-gender_age = pd.read_csv("data/gender_age_train.csv", dtype=dtypes)
+gender_age = pd.read_csv("data/gender_age_test.csv", dtype=dtypes)
 gender_age.head()
 events = pd.merge(events, gender_age, on='device_id', how='inner')
 events.head()
@@ -26,7 +26,7 @@ phone_brand = None
 gc.collect()
 events.head()
 
-events_train = events.event_id.drop_duplicates()
+events_test = events.event_id.drop_duplicates()
 
 ##### TABLES MERGED BY < app_id > IN app_events #####
 ##### inside this section, all merges had considered the app_events key (app_id)
@@ -52,7 +52,7 @@ gc.collect()
 
 app_events = pd.read_csv("data/app_events.csv", dtype=dtypes)
 len(app_events)
-app_events = app_events[app_events.event_id.isin(events_train)]
+app_events = app_events[app_events.event_id.isin(events_test)]
 len(app_events)
 app_events.head()
 app_events = pd.merge(app_events, app_categ, on='app_id', how='left')
@@ -76,9 +76,7 @@ len(events)
 events.head()
 len(events)
 
-events.to_csv("data/train_events_full_basic.csv", index=False, sep=";")
+events.to_csv("data/test_events_full_basic.csv", index=False, sep=";")
 
 
 exit()
-
-
