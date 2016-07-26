@@ -4,3 +4,6 @@
 *.sh~
 *.R~
 *.Rhistory
+*.tar
+*.gz
+*.zip
