@@ -2,3 +2,5 @@
 *.csv
 *.py~
 *.sh~
+*.R~
+*.Rhistory
