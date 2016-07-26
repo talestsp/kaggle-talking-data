@@ -65,8 +65,7 @@ gender_age_factors = list(gender_age.group.drop_duplicates().sort_values())
 len(gender_age)
 gender_age.head()
 
-group_loc = pd.merge(events, gender_age, on='device_id', how='left')
-del group_loc['device_id']
+group_loc = pd.merge(gender_age, events, on='device_id', how='left')
 del group_loc['event_id']
 events = None
 gender_age = None
