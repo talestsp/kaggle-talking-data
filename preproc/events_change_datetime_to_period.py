@@ -37,7 +37,7 @@ def set_day_time(hour):
         return("afternoon")
     if (18 <= hour & hour < 20):
         return("dinner")
-    elif (20 <= hour & hour < 0):
+    elif (20 <= hour & hour <= 23):
         return("night")
     else:
         raise Exception ("Malformed timestamp")
