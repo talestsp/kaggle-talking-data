@@ -37,8 +37,10 @@ def set_day_time(hour):
         return("afternoon")
     if (18 <= hour & hour < 20):
         return("dinner")
-    else: # (20 <= hour && hour < 0) {
+    elif (20 <= hour & hour < 0):
         return("night")
+    else:
+        raise Exception ("Malformed timestamp")
 
 ####################################################### Execution ####################################################### 
 
@@ -52,5 +54,6 @@ events = events.sort_values(['event_id'], ascending=True)
 
 ####################################################### Save Data ####################################################### 
 
-events.to_csv(data_dir + "/events_ready.csv", sep = ";", index=False)
+events.to_csv(data_dir + "/events_daytime.csv", sep = ";", index=False)
+
 
