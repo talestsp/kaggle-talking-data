@@ -14,17 +14,17 @@ dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "
 ##### TABLES MERGED BY < device_id > IN events #####
 ##### inside this section, all merges had considered the gender_age key (device_id)
 
-events = pd.read_csv(data_dir + "/events_v2.csv", dtype=dtypes)
+events = pd.read_csv(data_dir + "/events_v2.csv", dtype=dtypes, sep=";")
 
 if (dataset == "train"):
 	gender_age = pd.read_csv("data/gender_age_train.csv", dtype=dtypes)
+	del gender_age['gender']
+	del gender_age['age']
 elif (dataset == "test"):
 	gender_age = pd.read_csv("data/gender_age_test.csv", dtype=dtypes)
 else:
 	raise Exception("You mus specify a dataset to build: train or test")
 
-del gender_age['gender']
-del gender_age['age']
 gc.collect()
 gender_age.head()
 events = pd.merge(events, gender_age, on='device_id', how='inner')
