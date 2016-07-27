@@ -1,32 +1,53 @@
 import pandas as pd
 from os import chdir
 import gc
+import sys
 
-working_dir = "/home/tales/development/kaggle-talking-data/"
+working_dir = sys.argv[1]
+data_dir = sys.argv[2]
+dataset = sys.argv[3]
+
 chdir(working_dir)
 
-dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "app_id": long, "is_installed": str,  "is_active": str, "gender": str ,"age": int, "group": str, "group": str}
-
+dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "app_id": long, "is_installed": str,  "is_active": str, "gender": str ,"age": int, "group": str, "group": str, "phone_brand": str, "device_model": str}
 
 ##### TABLES MERGED BY < device_id > IN events #####
 ##### inside this section, all merges had considered the gender_age key (device_id)
 
-events = pd.read_csv("data/events.csv", dtype=dtypes)
+events = pd.read_csv(data_dir + "/events_v2.csv", dtype=dtypes)
 
-gender_age = pd.read_csv("data/gender_age_train.csv", dtype=dtypes)
+if (dataset == "train"):
+	gender_age = pd.read_csv("data/gender_age_train.csv", dtype=dtypes)
+elif (dataset == "test"):
+	gender_age = pd.read_csv("data/gender_age_test.csv", dtype=dtypes)
+else:
+	raise Exception("You mus specify a dataset to build: train or test")
+
+del gender_age['gender']
+del gender_age['age']
+gc.collect()
 gender_age.head()
 events = pd.merge(events, gender_age, on='device_id', how='inner')
 events.head()
 gender_age = None
 gc.collect()
 
-phone_brand = pd.read_csv("data/phone_brand_device_model_translated.csv", dtype=dtypes)
+phone_brand = pd.read_csv("data/phone_brand_device_model.csv", dtype=dtypes)
+phone_brand_id = pd.read_csv("data/phone_brand.csv", dtype=dtypes)
+phone_brand = pd.merge(phone_brand, phone_brand_id, on='phone_brand', how='left')
+model_device_id = pd.read_csv("data/model_device.csv", dtype=dtypes)
+phone_brand = pd.merge(phone_brand, model_device_id, on="device_model", how='left')
+del phone_brand['phone_brand']
+del phone_brand['device_model']
+gc.collect()
+phone_brand.head()
+
 events = pd.merge(events, phone_brand, on='device_id', how='left')
 phone_brand = None
 gc.collect()
 events.head()
 
-events_train = events.event_id.drop_duplicates()
+events_used = events.event_id.drop_duplicates()
 
 ##### TABLES MERGED BY < app_id > IN app_events #####
 ##### inside this section, all merges had considered the app_events key (app_id)
@@ -52,7 +73,7 @@ gc.collect()
 
 app_events = pd.read_csv("data/app_events.csv", dtype=dtypes)
 len(app_events)
-app_events = app_events[app_events.event_id.isin(events_train)]
+app_events = app_events[app_events.event_id.isin(events_used)]
 len(app_events)
 app_events.head()
 app_events = pd.merge(app_events, app_categ, on='app_id', how='left')
@@ -76,9 +97,9 @@ len(events)
 events.head()
 len(events)
 
-events.to_csv("data/train_events_full_basic.csv", index=False, sep=";")
-
+if (dataset == "train"):
+	events.to_csv("data/train_events_full_basic.csv", index=False, sep=";")
+elif (dataset == "test"):
+	events.to_csv("data/test_events_full_basic.csv", index=False, sep=";")
 
 exit()
-
-
