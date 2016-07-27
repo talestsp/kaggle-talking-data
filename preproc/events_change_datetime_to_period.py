@@ -2,18 +2,20 @@ import pandas as pd
 from os import chdir
 import gc
 import sys
+import datetime
 
 ####################################################### Load Data ####################################################### 
 
-working_dir = sys.argv[1]
-data_dir = sys.argv[2]
+working_dir = "/home/tales/development/kaggle-talking-data/"
+data_dir = "data/"
+
+#working_dir = sys.argv[1]
+#data_dir = sys.argv[2]
 chdir(working_dir)
 
 dtypes = {"event_id": int, "device_id": str, "timestamp": str, "longitude": float, "latitude": float}
 
-selected_columns = ["event_id", "device_id", "timestamp"]
-
-events = pd.read_csv(data_dir + "/events.csv", dtype=dtypes, usecols=selected_columns)
+events = pd.read_csv(data_dir + "/events.csv", dtype=dtypes)
 len(events)
 events = events.drop_duplicates()
 len(events)
@@ -37,23 +39,27 @@ def set_day_time(hour):
         return("afternoon")
     if (18 <= hour & hour < 20):
         return("dinner")
-    elif (20 <= hour & hour <= 23):
+    else: # (20 <= hour && hour < 0) {
         return("night")
-    else:
-        raise Exception ("Malformed timestamp")
+
+def set_weekday(timestamp):
+    WEEKDAY = {0: "monday", 1: "tuesday", 2: "wednesday", 3: "thursday", 4: "friday", 5: "saturday", 6: "sunday"}
+    pd.tslib.Timestamp(timestamp)
+    n_weekday = timestamp.weekday()
+    return WEEKDAY[n_weekday]
 
 ####################################################### Execution ####################################################### 
 
-events["timestamp"] = events["timestamp"].apply(extract_hour)
+events["daytime"] = events["timestamp"].apply(extract_hour)
 
-events = events.sort_values(['timestamp'], ascending=True)
+events = events.sort_values(['daytime'], ascending=True)
 
-events["timestamp"] = events["timestamp"].apply(set_day_time)
+events["daytime"] = events["daytime"].apply(set_day_time)
 
 events = events.sort_values(['event_id'], ascending=True)
 
+events["weekday"] = pd.to_datetime(events["timestamp"]).apply(set_weekday)
 ####################################################### Save Data ####################################################### 
 
-events.to_csv(data_dir + "/events_daytime.csv", sep = ";", index=False)
-
+events.to_csv(data_dir + "/events_v2.csv", sep = ";", index=False)
 
