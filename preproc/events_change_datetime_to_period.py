@@ -1,17 +1,19 @@
 import pandas as pd
 from os import chdir
 import gc
+import sys
 
 ####################################################### Load Data ####################################################### 
 
-working_dir = "/home/henrique/DataScience/talking_data"
+working_dir = sys.argv[1]
+data_dir = sys.argv[2]
 chdir(working_dir)
 
 dtypes = {"event_id": int, "device_id": str, "timestamp": str, "longitude": float, "latitude": float}
 
 selected_columns = ["event_id", "device_id", "timestamp"]
 
-events = pd.read_csv("data_files/events.csv", dtype=dtypes, usecols=selected_columns)
+events = pd.read_csv(data_dir + "/events.csv", dtype=dtypes, usecols=selected_columns)
 len(events)
 events = events.drop_duplicates()
 len(events)
@@ -50,5 +52,5 @@ events = events.sort_values(['event_id'], ascending=True)
 
 ####################################################### Save Data ####################################################### 
 
-events.to_csv("data_files_ready/events_ready.csv", sep = ";", index=False)
+events.to_csv(data_dir + "/events_ready.csv", sep = ";", index=False)
 
