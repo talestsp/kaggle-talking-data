@@ -15,12 +15,7 @@ chdir(working_dir)
 
 dtypes = {"event_id": int, "device_id": str, "timestamp": str, "longitude": float, "latitude": float, "is_active": int, "is_installed": int, "app_id": str, "label_id": str, "category": str}
 
-app_event_columns = ["event_id", "app_id", "is_installed", "is_active"]
-
-app_events = pd.read_csv("data_files/app_events.csv", dtype=dtypes, usecols=app_event_columns, sep=",", nrows=10000)
-
 app_labels = pd.read_csv("data_files_ready/app_labels_ready.csv", dtype=dtypes, sep=";")
-
 
 ####################################################### Functions #######################################################
 
