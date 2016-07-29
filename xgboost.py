@@ -10,6 +10,8 @@ import shutil
 from sklearn.metrics import log_loss
 from os import chdir
 
+import gc
+
 random.seed(13)
 
 working_dir = "/home/henrique/DataScience/talking_data/data_files"
@@ -134,3 +136,6 @@ print('Features [{}]: {}'.format(len(features), sorted(features)))
 test_prediction, score = run_xgb(train, test, features, 'group')
 print("LS: {}".format(round(score, 5)))
 create_submission(score, test, test_prediction)
+
+
+test_prediction
