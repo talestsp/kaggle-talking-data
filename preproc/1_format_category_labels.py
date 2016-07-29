@@ -345,7 +345,12 @@ app_labels = apps[["app_id", "general_groups_num"]]
 
 app_labels.columns = ["app_id", "label_id"]
 
+app_labels = app_labels.drop_duplicates()
+
+app_labels = app_labels.sort_values(['app_id', 'label_id'], ascending=[1, 1])
+
 app_labels.to_csv("data_files_ready/app_labels_ready.csv", sep = ";", index=False)
 
 app_labels.head()
+
 
