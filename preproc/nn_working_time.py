@@ -1,3 +1,6 @@
+#this script generates the group count for the locations
+#only to have insights
+
 import pandas as pd
 from os import chdir
 import gc
@@ -12,12 +15,10 @@ def save_group_frequencies(df_groupby, gender_age_factors):
 		group_lon = round(group[0][0], 2)
 		group_lat = round(group[0][1], 2)
 		group_df = group[1]
-		#print group_lon, group_lat
-		#print group_df
+		print group_df
+		print 
 		row = build_csv_rows(group_df, group_lon, group_lat, gender_age_factors)		
-		#print row
-		#print "---"
-		#print
+
 		rows.append(row)
 	freq_df = pd.DataFrame(rows)
 	freq_df.columns = ["lon", "lat", "F23-", "F24-26", "F27-28", "F29-32", "F33-42", "F43+", "M22-", "M23-26", "M27-28", "M29-31", "M32-38", "M39+", "total"]
@@ -26,8 +27,6 @@ def save_group_frequencies(df_groupby, gender_age_factors):
 #csv layout
 #lon, lat, F23-, F24-26, F27-28, F29-32, F33-42, F43+, M22-, M23-26, M27-28, M29-31, M32-38, M39+, total
 def build_csv_rows(group_df, group_lon, group_lat, gender_age_factors):
-	print group_df
-	print
 	row = [group_lon, group_lat]
 	n_ocurrences = len(group_df)
 	freq = dict(group_df.group.value_counts())
@@ -91,9 +90,5 @@ events = events.drop_duplicates()
 events.head()
 
 grouped_by_loc = events.groupby(["longitude", "latitude"])
-
-#APLICAR AQUI O NN_LOCATION TIRANDO:
-# 1- AS LINHAS DO PROPRIO DEVICE ID
-# 2- DEVICES ID IGUAS NO MESMO RAAIO 
 
 save_group_frequencies(grouped_by_loc, gender_age_factors)
