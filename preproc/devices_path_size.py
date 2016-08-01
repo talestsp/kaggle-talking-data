@@ -71,9 +71,9 @@ ev_weekend = ev_weekend.sort_values(['device_id', 'timestamp'], ascending=[True,
 path_week = devices_path_weight(ev_week)
 path_weekend = devices_path_weight(ev_weekend)
 
-#path_week = pd.DataFrame(path_week)
+path_week = pd.DataFrame(path_week)
 path_weekend = pd.DataFrame(path_weekend)
 
-#path_week.to_csv(data_dir + "path_weight_week.csv")
+path_week.to_csv(data_dir + "path_weight_week.csv")
 path_weekend.to_csv(data_dir + "path_weight_weekend.csv")
 
