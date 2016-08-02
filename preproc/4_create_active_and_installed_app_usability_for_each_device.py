@@ -46,7 +46,7 @@ def custom_merge(column):
     return (row)
 
 #concat and count top installed app categories 
-first = device_top_intalled_apps.groupby(["device_id"]).agg(custom_merge).reset_index()
+first = device_top_intalled_apps.groupby(["device_id"]).agg(lambda x: "|".join(x.tolist())).reset_index()
 
 second = device_top_intalled_apps.groupby(["device_id"]).agg('count').reset_index()
 
