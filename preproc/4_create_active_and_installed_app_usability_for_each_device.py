@@ -1,9 +1,8 @@
 import pandas as pd
 from os import chdir
 import gc
-import math
 
-# Purpose: 
+# Purpose: read "device_apps_ready.csv", create columns with top apps information for each device and saves it in the file "device_top_apps_prediction_ready.csv"
 
 # import sys
 # sys.modules[__name__].__dict__.clear()
@@ -37,35 +36,20 @@ device_top_active_apps = device_top_active_apps[["device_id", "new_label_id"]]
 
 ####################################################### Functions #######################################################
 
-# concat categories from each label_id to create an unique category
-def custom_merge(column):
-    row = ""
-    for i in column:
-        row = row + i + ","
-    row = row[:-1]
-    return (row)
+# concat and count top installed app categories 
+device_top_intalled_apps = device_top_intalled_apps.groupby(["device_id"])["new_label_id"].agg({"top_3_installed_apps": lambda x: ",".join(x.tolist()[0:3]), "top_2_installed_apps": lambda x: ",".join(x.tolist()[0:2]), "top_1_installed_app": lambda x: ",".join(x.tolist()[0:1]), 'distinct_app_categories': 'count'}).reset_index()
 
-#concat and count top installed app categories 
-first = device_top_intalled_apps.groupby(["device_id"]).agg(lambda x: "|".join(x.tolist())).reset_index()
-
-second = device_top_intalled_apps.groupby(["device_id"]).agg('count').reset_index()
-
-device_top_intalled_apps = pd.merge(first, second, how='left', on='device_id')
-
-device_top_intalled_apps.columns = ['device_id', 'top_installed_apps', 'distinct_app_categories']
-
-#concat and count top active app categories 
-
-first = device_top_active_apps.groupby(["device_id"]).agg(custom_merge).reset_index()
-
-second = device_top_active_apps.groupby(["device_id"]).agg('count').reset_index()
-
-device_top_active_apps = pd.merge(first, second, how='left', on='device_id')
-
-device_top_active_apps.columns = ['device_id', 'top_active_apps', 'distinct_active_app_categories']
+# concat and count top active app categories
+device_top_active_apps = device_top_active_apps.groupby(["device_id"])["new_label_id"].agg({"top_3_active_apps": lambda x: ",".join(x.tolist()[0:3]), "top_2_active_apps": lambda x: ",".join(x.tolist()[0:2]), "top_1_active_app": lambda x: ",".join(x.tolist()[0:1]), 'distinct_active_app_categories': 'count'}).reset_index()
 
 #merge two lists - WARNING: This generates some NaN as device_top_intalled_apps has more rows than device_top_active_apps
 
 device_top_intalled_apps = pd.merge(device_top_intalled_apps, device_top_active_apps, how='left', on='device_id')
 
 device_top_intalled_apps[pd.isnull(device_top_intalled_apps.distinct_active_app_categories)]
+
+######################################################## Save Data #######################################################
+
+device_top_intalled_apps.to_csv("data_files_ready/device_top_apps_prediction_ready.csv", sep = ";", index=False)
+
+
