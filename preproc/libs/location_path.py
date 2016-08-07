@@ -25,7 +25,7 @@ class GeoPath:
 			item = item[1]
 			ts = item.split(" ")[0]
 			days.append(ts)
-			
+
 		return set(days)
 
 	def distance(self, p1, p2, method="euclidean"):
@@ -35,7 +35,7 @@ class GeoPath:
 			raise Exception("Method not implemented")
 		return dist
 
-	def build_path(self, points_seq, decimal_precision=6, skip_if_bellow=0.03):
+	def build_path(self, points_seq, decimal_precision=6, skip_if_bellow=0.02):
 		last_point = points_seq[0]
 		path = []
 
