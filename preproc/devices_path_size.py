@@ -7,7 +7,6 @@ import gc
 import sys
 working_dir = "/home/tales/development/kaggle-talking-data/"
 data_dir = "data/"
-dataset = "train"
 chdir(working_dir)
 sys.path.append("preproc/libs/")
 from location_path import GeoPath
@@ -70,7 +69,7 @@ path_week = pd.DataFrame(path_week)
 path_weekend = pd.DataFrame(path_weekend)
 
 path_week.to_csv(data_dir + "path_weight_week.csv")
-path_weekend.to_csv(data_dir + "path_weight_weekend-002.csv")
+path_weekend.to_csv(data_dir + "path_weight_weekend.csv")
 
 path_week.path_weight.describe()
 path_week.path_weight_by_days.describe()
