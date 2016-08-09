@@ -50,9 +50,9 @@ def load_nn_location(dataset):
 
 def merge_all(df_list, dataset):
 	if(dataset == "train"):
-		devices = devices_train
+		devices = devices_train.drop_duplicates()
 	elif(dataset == "test"):
-		devices = devices_test
+		devices = devices_test.drop_duplicates()
 	#
 	final_df = devices
 	#
@@ -86,8 +86,8 @@ nn_loc_test = load_nn_location("test")
 data_train = merge_all([pw_train, nn_loc_train], "train")
 data_test = merge_all([pw_test, nn_loc_test], "test")
 
-data_train = remove_na_rows(data_train)
-data_test = remove_na_rows(data_test)
+#data_train = remove_na_rows(data_train)
+#data_test = remove_na_rows(data_test)
 
 data_train.to_csv(data_dir + "data_train.csv", sep = ";")
 data_test.to_csv(data_dir + "data_test.csv", sep = ";")
