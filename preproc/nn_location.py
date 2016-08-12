@@ -158,7 +158,9 @@ events_test = events_test[ (events_test["longitude"] != 104.0) & (events_test["l
 
 #calculating the frequencies for each device, considering its location, for the TEST set
 devices_freqs_by_loc = []
+counter = 1
 for device_test in devices_test:
+	print len(devices_test), counter
 	df_device = events_test[ events_test["device_id"] == device_test ]
 	device_freqs_by_loc = pd.DataFrame()
 
@@ -174,6 +176,7 @@ for device_test in devices_test:
 	if (len(device_freqs_by_loc) > 0):
 		summarized = summarize_fres_by_device(device_test, device_freqs_by_loc)
 		devices_freqs_by_loc.append(summarized)
+	counter = counter + 1
 
 devices_fresq_test = pd.DataFrame(devices_freqs_by_loc)
 

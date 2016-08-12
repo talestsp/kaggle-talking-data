@@ -25,7 +25,7 @@ class GeoPath:
 			item = item[1]
 			ts = item.split(" ")[0]
 			days.append(ts)
-			
+
 		return set(days)
 
 	def distance(self, p1, p2, method="euclidean"):

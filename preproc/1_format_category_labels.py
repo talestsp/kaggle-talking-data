@@ -1,15 +1,17 @@
 import pandas as pd
 from os import chdir
+import re
 
 ####################################################### Load Data ####################################################### 
 
-working_dir = "/home/henrique/DataScience/talking_data"
+working_dir = "/home/tales/development/kaggle-talking-data/"
+data_dir = "data/"
 chdir(working_dir)
 
 dtypes = {"event_id": int, "device_id": str, "timestamp": str, "longitude": float, "latitude": float, "app_id": str, "is_installed": int, "is_active": int, "label_id": str, "category": str}
 
-label_categories = pd.read_csv("data_files/label_categories.csv", dtype=dtypes)
-app_labels = pd.read_csv("data_files/app_labels.csv", dtype=dtypes)
+label_categories = pd.read_csv(data_dir + "/label_categories.csv", dtype=dtypes)
+app_labels = pd.read_csv(data_dir + "/app_labels.csv", dtype=dtypes)
 
 apps = pd.merge(app_labels, label_categories, how='left', on='label_id')
 
@@ -337,7 +339,7 @@ label_categories = label_categories.sort_values(['general_groups_num'], ascendin
 
 label_categories.columns = ["label_id", "label_categories"]
 
-label_categories.to_csv("data_files_ready/label_categories_ready.csv", sep = ",", index=False)
+label_categories.to_csv(data_dir + "label_categories_ready.csv", sep = ",", index=False)
 
 ####################################################### Create New app_labels.csv ####################################################### 
 
@@ -349,8 +351,9 @@ app_labels = app_labels.drop_duplicates()
 
 app_labels = app_labels.sort_values(['app_id', 'label_id'], ascending=[1, 1])
 
-app_labels.to_csv("data_files_ready/app_labels_ready.csv", sep = ";", index=False)
+app_labels.to_csv(data_dir + "/app_labels_ready.csv", sep = ";", index=False)
 
-app_labels.head()
+print app_labels.head()
+print len(app_labels)
 
 
