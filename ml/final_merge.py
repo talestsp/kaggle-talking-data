@@ -48,6 +48,12 @@ def load_nn_location(dataset):
 		del data["Unnamed: 0"]
 		return data
 
+# Inserted by Henrique
+def load_app_event_activity():
+	data = pd.read_csv(data_dir + "/device_top_apps_prediction_ready.csv", dtype=dtypes, sep=";")
+	return data
+
+
 def merge_all(df_list, dataset):
 	if(dataset == "train"):
 		devices = devices_train.drop_duplicates()
@@ -83,8 +89,10 @@ pw_test = load_path_weight("test")
 nn_loc_train = load_nn_location("train")
 nn_loc_test = load_nn_location("test")
 
-data_train = merge_all([pw_train, nn_loc_train], "train")
-data_test = merge_all([pw_test, nn_loc_test], "test")
+device_app_activity = load_app_event_activity()
+
+data_train = merge_all([pw_train, nn_loc_train, device_app_activity], "train")
+data_test = merge_all([pw_test, nn_loc_test, device_app_activity], "test")
 
 #data_train = remove_na_rows(data_train)
 #data_test = remove_na_rows(data_test)

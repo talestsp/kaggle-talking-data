@@ -9,18 +9,19 @@ import time
 import shutil
 from sklearn.metrics import log_loss
 from os import chdir
+from sklearn.preprocessing import LabelEncoder
 
 import gc
 
 random.seed(13)
 
-working_dir = "/home/henrique/DataScience/talking_data/data_files"
+working_dir = "/home/henrique/DataScience/talking_data"
 chdir(working_dir)
 
 def run_xgb(train, test, features, target, random_state=0):
-    eta = 0.1
+    eta = 0.2
     max_depth = 3
-    subsample = 0.7
+    subsample = 0.9
     colsample_bytree = 0.7
     start_time = time.time()
 
@@ -94,32 +95,50 @@ def map_column(table, f):
 def read_train_test():
     # Events
     print('Read events...')
-    events = pd.read_csv("events.csv", dtype={'device_id': np.str})
+    events = pd.read_csv("data_files/events.csv", dtype={'device_id': np.str})
     events['counts'] = events.groupby(['device_id'])['event_id'].transform('count')
     events_small = events[['device_id', 'counts']].drop_duplicates('device_id', keep='first')
 
     # Phone brand
     print('Read brands...')
-    pbd = pd.read_csv("phone_brand_device_model.csv", dtype={'device_id': np.str})
+    pbd = pd.read_csv("data_files/phone_brand_device_model.csv", dtype={'device_id': np.str})
     pbd.drop_duplicates('device_id', keep='first', inplace=True)
-    pbd = map_column(pbd, 'phone_brand')
-    pbd = map_column(pbd, 'device_model')
+    pbd.phone_brand = LabelEncoder().fit_transform(pbd.phone_brand)
+    pbd.device_model = LabelEncoder().fit_transform(pbd.device_model)
+    # pbd = map_column(pbd, 'phone_brand')
+    # pbd = map_column(pbd, 'device_model')
+    
+    
+    # Apps usability
+    print('Read app events...')
+    apps = pd.read_csv("data_files_ready/device_top_apps_prediction_ready.csv", dtype={'device_id': np.str}, sep=";")
+    apps.drop_duplicates('device_id', keep='first', inplace=True)
+    apps.top_3_installed_apps = LabelEncoder().fit_transform(apps.top_3_installed_apps)
+    apps.top_2_installed_apps = LabelEncoder().fit_transform(apps.top_2_installed_apps)
+    apps.top_3_active_apps = LabelEncoder().fit_transform(apps.top_3_active_apps)
+    apps.top_2_active_apps = LabelEncoder().fit_transform(apps.top_2_active_apps)
+    # apps = map_column(apps, 'top_3_installed_apps')
+    # apps = map_column(apps, 'top_2_installed_apps')
+    # apps = map_column(apps, 'top_3_active_apps')
+    # apps = map_column(apps, 'top_2_active_apps')
 
     # Train
     print('Read train...')
-    train = pd.read_csv("gender_age_train.csv", dtype={'device_id': np.str})
+    train = pd.read_csv("data_files/gender_age_train.csv", dtype={'device_id': np.str})
     train = map_column(train, 'group')
     train = train.drop(['age'], axis=1)
     train = train.drop(['gender'], axis=1)
-    train = pd.merge(train, pbd, how='left', on='device_id', left_index=True)
-    train = pd.merge(train, events_small, how='left', on='device_id', left_index=True)
+    train = pd.merge(train, pbd, how='left', on='device_id')
+    train = pd.merge(train, events_small, how='left', on='device_id')
+    train = pd.merge(train, apps, how='left', on='device_id')
     train.fillna(-1, inplace=True)
 
     # Test
     print('Read test...')
-    test = pd.read_csv("gender_age_test.csv", dtype={'device_id': np.str})
-    test = pd.merge(test, pbd, how='left', on='device_id', left_index=True)
-    test = pd.merge(test, events_small, how='left', on='device_id', left_index=True)
+    test = pd.read_csv("data_files/gender_age_test.csv", dtype={'device_id': np.str})
+    test = pd.merge(test, pbd, how='left', on='device_id')
+    test = pd.merge(test, events_small, how='left', on='device_id')
+    test = pd.merge(test, apps, how='left', on='device_id')
     test.fillna(-1, inplace=True)
 
     # Features
@@ -139,3 +158,5 @@ create_submission(score, test, test_prediction)
 
 
 test_prediction
+
+
