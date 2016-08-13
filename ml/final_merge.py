@@ -53,6 +53,15 @@ def load_app_event_activity():
 	data = pd.read_csv(data_dir + "/device_top_apps_prediction_ready.csv", dtype=dtypes, sep=";")
 	return data
 
+def load_app_usage_clusters(dataset):
+	if (dataset == "train"):
+		data = pd.read_csv(data_dir + "/app_cluster_12_train.csv", dtype=dtypes, sep=";")
+		del data["Unnamed: 0"]
+		return data
+	elif (dataset == "test"):
+		data = pd.read_csv(data_dir + "/app_cluster_12_test.csv", dtype=dtypes, sep=";")
+		del data["Unnamed: 0"]
+		return data
 
 def merge_all(df_list, dataset):
 	if(dataset == "train"):
@@ -67,12 +76,6 @@ def merge_all(df_list, dataset):
 	#
 	print df.columns.tolist()
 	return final_df
-
-def remove_na_rows(df):
-	columns = list(df.columns)
-	columns.remove("device_id")
-	return df.dropna(subset=columns, how="all")
-
 
 data_dir = "data/"
 working_dir = "/home/tales/development/kaggle-talking-data/"
@@ -91,11 +94,11 @@ nn_loc_test = load_nn_location("test")
 
 device_app_activity = load_app_event_activity()
 
-data_train = merge_all([pw_train, nn_loc_train, device_app_activity], "train")
-data_test = merge_all([pw_test, nn_loc_test, device_app_activity], "test")
+app_usage_cluster_train = load_app_usage_clusters("train")
+app_usage_cluster_test = load_app_usage_clusters("test")
 
-#data_train = remove_na_rows(data_train)
-#data_test = remove_na_rows(data_test)
+data_train = merge_all([pw_train, nn_loc_train, device_app_activity, app_usage_cluster_train], "train")
+data_test = merge_all([pw_test, nn_loc_test, device_app_activity, app_usage_cluster_test], "test")
 
 data_train.to_csv(data_dir + "data_train.csv", sep = ";")
 data_test.to_csv(data_dir + "data_test.csv", sep = ";")
