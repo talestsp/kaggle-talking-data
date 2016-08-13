@@ -130,8 +130,8 @@ len(most_diff_apps)
 
 
 #TODO set the mode of those event_sizes by device 
-event_size_by_device = app_events.groupby(by=["device_id", "event_id"]).apply(n_events)
-event_size_by_device.to_csv(data_dir + "event_size_by_device.csv", sep = ";")
+#event_size_by_device = app_events.groupby(by=["device_id", "event_id"]).apply(n_events)
+#event_size_by_device.to_csv(data_dir + "event_size_by_device.csv", sep = ";")
 
 
 
