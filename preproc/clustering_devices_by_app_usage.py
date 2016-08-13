@@ -3,7 +3,6 @@ from os import chdir
 import gc
 from sklearn.cluster import KMeans
 
-
 working_dir = "/home/tales/development/kaggle-talking-data/"
 data_dir = "data/"
 chdir(working_dir)
