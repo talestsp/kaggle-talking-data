@@ -7,7 +7,7 @@ working_dir = "/home/tales/development/kaggle-talking-data/"
 data_dir = "data/"
 chdir(working_dir)
 
-n = 24
+n = 48
 
 dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "app_id": long, "is_installed": str,  "is_active": str, "gender": str ,"age": int, "group": str, "group": str, "phone_brand": str, "device_model": str, "daytime": str, "weekday": str}
 
