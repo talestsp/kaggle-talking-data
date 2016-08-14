@@ -1,6 +1,5 @@
 import pandas as pd
 from os import chdir
-#from ml.libs.XGBooster import XGBooster
 import gc
 import sys
 sys.path.append("ml/libs/")
@@ -15,8 +14,8 @@ dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "
 
 data_test = pd.read_csv(data_dir + "/data_test.csv", dtype=dtypes, sep=";")
 data_train = pd.read_csv(data_dir + "/data_train.csv", dtype=dtypes, sep=";")
-
-
+target = "group"
+features = ['group', 'week_path_weight', 'week_path_weight_by_days', 'weekend_path_weight', 'weekend_path_weight_by_days', 'nn.F23-', 'nn.F24-26', 'nn.F27-28', 'nn.F29-32', 'nn.F33-42', 'nn.F43+', 'nn.M22-', 'nn.M23-26', 'nn.M27-28', 'nn.M29-31', 'nn.M32-38', 'nn.M39+', 'top_3_installed_apps', 'top_2_installed_apps', 'top_1_installed_app', 'distinct_app_categories', 'distinct_active_app_categories', 'top_2_active_apps', 'top_3_active_apps', 'top_1_active_app', 'cluster_12', 'cluster_24', 'cluster_36', 'cluster_48', 'model_id', 'brand_id']
 
 
 params = {}
@@ -33,4 +32,8 @@ params['n_class'] = 12
 num_boost_round = 500 #number of boosting iterations.
 early_stopping_rounds = 50 #
 
+bxg = BoosterXG(data_train, data_test, target, params, features, num_boost_round, early_stopping_rounds)
 
+pred = bxg.run_xgboost()
+
+score = bxg.cross_validation()
