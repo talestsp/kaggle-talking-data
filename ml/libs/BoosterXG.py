@@ -1,7 +1,7 @@
 from xgboost import xgb
 from sklearn.cross_validation import train_test_split
 
-class XGBoost:
+class BoosterXG:
 
 	def __init__(self, data_train, data_test, target, features, params, num_boost_round, early_stopping_rounds):
 		self.df_train = df_train
