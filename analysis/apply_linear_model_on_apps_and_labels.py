@@ -11,6 +11,7 @@ from sklearn.cross_validation import StratifiedKFold
 from sklearn.metrics import log_loss
 from scipy.io import mmwrite
 import gc
+from os import chdir
 
 ####################################################### Load Data ####################################################### 
 
@@ -161,17 +162,21 @@ clf.fit(Xtrain, y)
 pred = pd.DataFrame(clf.predict_proba(Xtest), index = gatest.index, columns=targetencoder.classes_)
 pred.head()
 
+working_dir = "/home/henrique/DataScience/talking_data"
+chdir(working_dir)
+
 pred.to_csv('logreg_subm_2.27332.csv',index=True)
 
-gatest = gatrain = appevents = d = events = applabels = devicelabels = m = phone = None
+# gatest = gatrain = appevents = d = events = applabels = devicelabels = m = phone = None
 
-Xte_app = Xte_brand = Xte_label = Xte_model = Xtr_app = Xtr_brand = Xtr_label = Xtr_model = None
+# Xte_app = Xte_brand = Xte_label = Xte_model = Xtr_app = Xtr_brand = Xtr_label = Xtr_model = None
 
-gc.collect()
+# gc.collect()
 
-Xtrain.toarray()[2]
+# Xtrain.toarray()[2]
 
-mmwrite("file", Xtrain)
+# mmwrite("file.mtx", Xtrain)
+
 
 
 
