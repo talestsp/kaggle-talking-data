@@ -1,5 +1,7 @@
 import xgboost as xgb
 from sklearn.cross_validation import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import log_loss
 
 class BoosterXG:
 
@@ -13,20 +15,24 @@ class BoosterXG:
 		self.early_stopping_rounds = early_stopping_rounds
 
 	def run_xgboost(self, df_train=None, df_test=None, ntree_limit=None):
-		if df_train == None:
+		if df_train is None:
 			df_train = self.df_train
-		if df_test == None:
+		if df_test is None:
 			df_test = self.df_test
-
+		#
 		target_train = df_train[self.target]
+		target_train = LabelEncoder().fit_transform(target_train)
+		#
 		dm_train = xgb.DMatrix(df_train[self.features], target_train)
-
-		gbm = xgb.train(self.params, dm_train, num_boost_round=self.num_boost_round, early_stopping_rounds=self.early_stopping_rounds)
-		
+		#
+		print ("### TRAINING ###")
+		gbm = xgb.train(params=self.params, dtrain=dm_train, num_boost_round=self.num_boost_round)
+		#
 		if (ntree_limit == None):
 			ntree_limit = gbm.best_iteration
-
-		pred = gbm.predict(xgb.DMatrix(df_test[features]), ntree_limit=ntree_limit)    	
+		#
+		print ("### TESTING ###")
+		pred = gbm.predict(xgb.DMatrix(df_test[self.features]), ntree_limit=ntree_limit)    	
 		return pred
 
 	def cross_validation(self, test_size=0.25, random_state=0):

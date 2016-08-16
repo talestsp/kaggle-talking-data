@@ -93,7 +93,7 @@ data_dir = "data/"
 working_dir = "/home/tales/development/kaggle-talking-data/"
 chdir(working_dir)
 
-dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "app_id": long, "is_installed": str,  "is_active": str, "gender": str ,"age": int, "group": str, "group": str, "phone_brand": str, "device_model": str, "daytime": str, "weekday": str}
+dtypes = {'label_id': int, 'category': str, "event_id": str, "device_id": str, "app_id": str, "is_installed": str,  "is_active": str, "gender": str ,"age": int, "group": str, "group": str, "phone_brand": str, "device_model": str, "daytime": str, "weekday": str}
 
 devices_train = pd.read_csv(data_dir + "/gender_age_train.csv", dtype=dtypes, sep=",")
 devices_test = pd.read_csv(data_dir + "/gender_age_test.csv", dtype=dtypes, sep=",")

@@ -15,7 +15,7 @@ import gc
 
 random.seed(13)
 
-working_dir = "/home/henrique/DataScience/talking_data"
+working_dir = "/home/tales/development/kaggle-talking-data/"
 chdir(working_dir)
 
 def run_xgb(train, test, features, target, random_state=0):
@@ -24,7 +24,7 @@ def run_xgb(train, test, features, target, random_state=0):
     subsample = 0.9
     colsample_bytree = 0.7
     start_time = time.time()
-
+    #
     print('XGBoost params. ETA: {}, MAX_DEPTH: {}, SUBSAMPLE: {}, COLSAMPLE_BY_TREE: {}'.format(eta, max_depth, subsample, colsample_bytree))
     params = {
         "objective": "multi:softprob",
@@ -41,7 +41,7 @@ def run_xgb(train, test, features, target, random_state=0):
     num_boost_round = 500
     early_stopping_rounds = 50
     test_size = 0.3
-
+    #
     X_train, X_valid = train_test_split(train, test_size=test_size, random_state=random_state)
     print('Length train:', len(X_train.index))
     print('Length valid:', len(X_valid.index))
@@ -49,17 +49,17 @@ def run_xgb(train, test, features, target, random_state=0):
     y_valid = X_valid[target]
     dtrain = xgb.DMatrix(X_train[features], y_train)
     dvalid = xgb.DMatrix(X_valid[features], y_valid)
-
+    #
     watchlist = [(dtrain, 'train'), (dvalid, 'eval')]
     gbm = xgb.train(params, dtrain, num_boost_round, evals=watchlist, early_stopping_rounds=early_stopping_rounds, verbose_eval=True)
-
+    #
     print("Validating...")
     check = gbm.predict(xgb.DMatrix(X_valid[features]), ntree_limit=gbm.best_iteration)
     score = log_loss(y_valid.tolist(), check)
-
+    #
     print("Predict test set...")
     test_prediction = gbm.predict(xgb.DMatrix(test[features]), ntree_limit=gbm.best_iteration)
-
+    #
     print('Training time: {} minutes'.format(round((time.time() - start_time)/60, 2)))
     return test_prediction.tolist(), score
 
@@ -95,23 +95,23 @@ def map_column(table, f):
 def read_train_test():
     # Events
     print('Read events...')
-    events = pd.read_csv("data_files/events.csv", dtype={'device_id': np.str})
+    events = pd.read_csv("data/events.csv", dtype={'device_id': np.str})
     events['counts'] = events.groupby(['device_id'])['event_id'].transform('count')
     events_small = events[['device_id', 'counts']].drop_duplicates('device_id', keep='first')
-
+    #
     # Phone brand
     print('Read brands...')
-    pbd = pd.read_csv("data_files/phone_brand_device_model.csv", dtype={'device_id': np.str})
+    pbd = pd.read_csv("data/phone_brand_device_model.csv", dtype={'device_id': np.str})
     pbd.drop_duplicates('device_id', keep='first', inplace=True)
     pbd.phone_brand = LabelEncoder().fit_transform(pbd.phone_brand)
     pbd.device_model = LabelEncoder().fit_transform(pbd.device_model)
     # pbd = map_column(pbd, 'phone_brand')
     # pbd = map_column(pbd, 'device_model')
-    
-    
+    #
+    #
     # Apps usability
     print('Read app events...')
-    apps = pd.read_csv("data_files_ready/device_top_apps_prediction_ready.csv", dtype={'device_id': np.str}, sep=";")
+    apps = pd.read_csv("data_ready/device_top_apps_prediction_ready.csv", dtype={'device_id': np.str}, sep=";")
     apps.drop_duplicates('device_id', keep='first', inplace=True)
     apps.top_3_installed_apps = LabelEncoder().fit_transform(apps.top_3_installed_apps)
     apps.top_2_installed_apps = LabelEncoder().fit_transform(apps.top_2_installed_apps)
@@ -121,10 +121,10 @@ def read_train_test():
     # apps = map_column(apps, 'top_2_installed_apps')
     # apps = map_column(apps, 'top_3_active_apps')
     # apps = map_column(apps, 'top_2_active_apps')
-
+    #
     # Train
     print('Read train...')
-    train = pd.read_csv("data_files/gender_age_train.csv", dtype={'device_id': np.str})
+    train = pd.read_csv("data/gender_age_train.csv", dtype={'device_id': np.str})
     train = map_column(train, 'group')
     train = train.drop(['age'], axis=1)
     train = train.drop(['gender'], axis=1)
@@ -132,19 +132,19 @@ def read_train_test():
     train = pd.merge(train, events_small, how='left', on='device_id')
     train = pd.merge(train, apps, how='left', on='device_id')
     train.fillna(-1, inplace=True)
-
+    #
     # Test
     print('Read test...')
-    test = pd.read_csv("data_files/gender_age_test.csv", dtype={'device_id': np.str})
+    test = pd.read_csv("data/gender_age_test.csv", dtype={'device_id': np.str})
     test = pd.merge(test, pbd, how='left', on='device_id')
     test = pd.merge(test, events_small, how='left', on='device_id')
     test = pd.merge(test, apps, how='left', on='device_id')
     test.fillna(-1, inplace=True)
-
+    #
     # Features
     features = list(test.columns.values)
     features.remove('device_id')
-
+    #
     return train, test, features
 
 
