@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import MinMaxScaler
 from scipy.sparse import csr_matrix, hstack
 from sklearn.linear_model import LogisticRegression
 from sklearn.cross_validation import StratifiedKFold
@@ -15,54 +16,58 @@ from os import chdir
 
 ####################################################### Load Data ####################################################### 
 
-# working_dir = "/home/henrique/DataScience/talking_data"
-# chdir(working_dir)
+working_dir = "/home/henrique/DataScience/talking_data"
+chdir(working_dir)
 
-datadir = '/home/henrique/DataScience/talking_data/data_files'
+gatrain = pd.read_csv('data_files/gender_age_train.csv', index_col='device_id')
 
-gatrain = pd.read_csv(os.path.join(datadir,'gender_age_train.csv'), index_col='device_id')
+gatest = pd.read_csv('data_files/gender_age_test.csv', index_col = 'device_id')
 
-gatest = pd.read_csv(os.path.join(datadir,'gender_age_test.csv'), index_col = 'device_id')
-
-phone = pd.read_csv(os.path.join(datadir,'phone_brand_device_model.csv'))
+phone = pd.read_csv('data_files/phone_brand_device_model.csv')
 
 # Get rid of duplicate device ids in phone
 phone = phone.drop_duplicates('device_id',keep='first').set_index('device_id')
 
-events = pd.read_csv(os.path.join(datadir,'events.csv'), parse_dates=['timestamp'], index_col='event_id')
+events = pd.read_csv('data_files/events.csv', parse_dates=['timestamp'], index_col='event_id')
 
-appevents = pd.read_csv(os.path.join(datadir,'app_events.csv'), 
+appevents = pd.read_csv('data_files/app_events.csv', 
                         usecols=['event_id','app_id','is_active'],
+                        # nrows=300000,
                         dtype={'is_active':bool})
                         
-applabels = pd.read_csv(os.path.join(datadir,'app_labels.csv'))
+applabels = pd.read_csv('data_files/app_labels.csv')
 
 ####################################################### Phone Brand ####################################################### 
 
 gatrain['trainrow'] = np.arange(gatrain.shape[0])
 gatest['testrow'] = np.arange(gatest.shape[0])
 
-brandencoder = LabelEncoder().fit(phone.phone_brand)
-phone['brand'] = brandencoder.transform(phone['phone_brand'])
+phone['brand'] = LabelEncoder().fit_transform(phone.phone_brand)
+
 gatrain['brand'] = phone['brand']
 gatest['brand'] = phone['brand']
+
 Xtr_brand = csr_matrix((np.ones(gatrain.shape[0]), 
                        (gatrain.trainrow, gatrain.brand)))
 Xte_brand = csr_matrix((np.ones(gatest.shape[0]), 
                        (gatest.testrow, gatest.brand)))
+                       
 print('Brand features: train shape {}, test shape {}'.format(Xtr_brand.shape, Xte_brand.shape))
 
 ####################################################### Phone Model ####################################################### 
 
-m = phone.phone_brand.str.cat(phone.device_model)
-modelencoder = LabelEncoder().fit(m)
-phone['model'] = modelencoder.transform(m)
+brand_model = phone.phone_brand.str.cat(phone.device_model)
+
+phone['model'] = LabelEncoder().fit_transform(brand_model)
+
 gatrain['model'] = phone['model']
 gatest['model'] = phone['model']
+
 Xtr_model = csr_matrix((np.ones(gatrain.shape[0]), 
                        (gatrain.trainrow, gatrain.model)))
 Xte_model = csr_matrix((np.ones(gatest.shape[0]), 
                        (gatest.testrow, gatest.model)))
+                       
 print('Model features: train shape {}, test shape {}'.format(Xtr_model.shape, Xte_model.shape))
 
 
@@ -70,15 +75,16 @@ print('Model features: train shape {}, test shape {}'.format(Xtr_model.shape, Xt
 
 appencoder = LabelEncoder().fit(appevents.app_id)
 appevents['app'] = appencoder.transform(appevents.app_id)
-napps = len(appencoder.classes_)
+napps = len(appevents['app'].unique())
 
-phone = appevents.app_id.unique()
+unique_app_ids = appevents.app_id.unique()
 
 appevents = (appevents.merge(events[['device_id']], how='left',left_on='event_id',right_index=True)
                        .groupby(['device_id','app'])['app'].agg(['size'])
                        .merge(gatrain[['trainrow']], how='left', left_index=True, right_index=True)
                        .merge(gatest[['testrow']], how='left', left_index=True, right_index=True)
                        .reset_index())
+
 appevents.head()
 
 gc.collect()
@@ -86,19 +92,24 @@ gc.collect()
 d = appevents.dropna(subset=['trainrow'])
 Xtr_app = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.app)), 
                       shape=(gatrain.shape[0],napps))
+                
+
 d = appevents.dropna(subset=['testrow'])
 Xte_app = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.app)), 
                       shape=(gatest.shape[0],napps))
+
 print('Apps data: train shape {}, test shape {}'.format(Xtr_app.shape, Xte_app.shape))
 
 
 ####################################################### App Label Features ####################################################### 
 
-applabels = applabels.loc[applabels.app_id.isin(phone)]
+#filter applabels to have only app_ids that are in app_events
+applabels = applabels.loc[applabels.app_id.isin(unique_app_ids)]
+
 applabels['app'] = appencoder.transform(applabels.app_id)
-labelencoder = LabelEncoder().fit(applabels.label_id)
-applabels['label'] = labelencoder.transform(applabels.label_id)
-nlabels = len(labelencoder.classes_)
+
+applabels['label'] = LabelEncoder().fit_transform(applabels.label_id)
+nlabels = len(applabels['label'].unique())
 
 devicelabels = (appevents[['device_id','app']]
                 .merge(applabels[['app','label']])
@@ -120,8 +131,8 @@ print('Labels data: train shape {}, test shape {}'.format(Xtr_label.shape, Xte_l
 
 ####################################################### Concatenate All Features ####################################################### 
 
-Xtrain = hstack((Xtr_brand, Xtr_model, Xtr_app, Xtr_label), format='csr')
-Xtest =  hstack((Xte_brand, Xte_model, Xte_app, Xte_label), format='csr')
+Xtrain = hstack((Xtr_brand, Xtr_model, Xtr_app, Xtr_label, Xtr_top3_i, Xtr_top3_a, Xtr_top2_i, Xtr_top2_a), format='csr')
+Xtest =  hstack((Xte_brand, Xte_model, Xte_app, Xte_label,  Xte_top3_i, Xte_top3_a, Xte_top2_i, Xte_top2_a), format='csr')
 print('All features: train shape {}, test shape {}'.format(Xtrain.shape, Xtest.shape))
 
 ####################################################### Cross Validation ####################################################### 
@@ -178,6 +189,54 @@ pred.to_csv('logreg_subm_2.27332.csv',index=True)
 # mmwrite("file.mtx", Xtrain)
 
 
+device_top_intalled_apps = pd.read_csv('data_files_ready/device_top_apps_prediction_ready.csv', index_col = 'device_id', sep=';')
+
+device_top_intalled_apps = (device_top_intalled_apps.merge(gatrain[['trainrow']], how='left', left_index=True, right_index=True)
+                .merge(gatest[['testrow']], how='left', left_index=True, right_index=True)).reset_index()
+
+napps = len(device_top_intalled_apps['top_2_installed_apps'].unique())
 
 
+d = device_top_intalled_apps.dropna(subset=['trainrow'])
+Xtr_top2_i = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.top_2_installed_apps)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled_apps.dropna(subset=['testrow'])
+Xte_top2_i = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.top_2_installed_apps)), 
+                      shape=(gatest.shape[0],napps))
 
+
+napps = len(device_top_intalled_apps['top_3_installed_apps'].unique())
+
+
+d = device_top_intalled_apps.dropna(subset=['trainrow'])
+Xtr_top3_i = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.top_3_installed_apps)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled_apps.dropna(subset=['testrow'])
+Xte_top3_i = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.top_3_installed_apps)), 
+                      shape=(gatest.shape[0],napps))
+
+
+napps = len(device_top_intalled_apps['top_2_active_apps'].unique())
+
+
+d = device_top_intalled_apps.dropna(subset=['trainrow'])
+Xtr_top2_a = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.top_2_active_apps)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled_apps.dropna(subset=['testrow'])
+Xte_top2_a = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.top_2_active_apps)), 
+                      shape=(gatest.shape[0],napps))
+
+
+napps = len(device_top_intalled_apps['top_3_active_apps'].unique())
+
+
+d = device_top_intalled_apps.dropna(subset=['trainrow'])
+Xtr_top3_a = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.top_3_active_apps)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled_apps.dropna(subset=['testrow'])
+Xte_top3_a = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.top_3_active_apps)), 
+                      shape=(gatest.shape[0],napps))

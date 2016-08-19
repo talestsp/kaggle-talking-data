@@ -1,6 +1,7 @@
 import pandas as pd
 from os import chdir
 import gc
+from sklearn.preprocessing import LabelEncoder
 
 # Purpose: read "device_apps_ready.csv", create columns with top apps information for each device and saves it in the file "device_top_apps_prediction_ready.csv"
 
@@ -47,6 +48,12 @@ device_top_active_apps = device_top_active_apps.groupby(["device_id"])["new_labe
 device_top_intalled_apps = pd.merge(device_top_intalled_apps, device_top_active_apps, how='left', on='device_id')
 
 device_top_intalled_apps[pd.isnull(device_top_intalled_apps.distinct_active_app_categories)]
+
+device_top_intalled_apps.top_3_installed_apps = LabelEncoder().fit_transform(device_top_intalled_apps.top_3_installed_apps)
+device_top_intalled_apps.top_3_active_apps = LabelEncoder().fit_transform(device_top_intalled_apps.top_3_active_apps)
+
+device_top_intalled_apps.top_2_installed_apps = LabelEncoder().fit_transform(device_top_intalled_apps.top_2_installed_apps)
+device_top_intalled_apps.top_2_active_apps = LabelEncoder().fit_transform(device_top_intalled_apps.top_2_active_apps)
 
 ######################################################## Save Data #######################################################
 
