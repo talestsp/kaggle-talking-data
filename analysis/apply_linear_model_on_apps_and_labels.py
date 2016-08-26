@@ -129,10 +129,150 @@ Xte_label = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.label)),
 print('Labels data: train shape {}, test shape {}'.format(Xtr_label.shape, Xte_label.shape))
 
 
+####################################################### Top App Period Features ####################################################### 
+
+device_top_intalled_apps = pd.read_csv('data_files_ready/device_top_active_apps_by_period.csv', sep=';')
+
+device_top_intalled_apps =  device_top_intalled_apps.pivot(index='device_id', columns='timestamp', values='app_id')
+
+device_top_intalled_apps = (device_top_intalled_apps.merge(gatrain[['trainrow']], how='left', left_index=True, right_index=True)
+                .merge(gatest[['testrow']], how='left', left_index=True, right_index=True)).reset_index()
+                
+
+# afternoon
+
+period = 'afternoon'
+
+device_top_intalled = device_top_intalled_apps.dropna(subset=[period])
+
+device_top_intalled[period] = LabelEncoder().fit_transform(device_top_intalled[period])
+
+napps = len(device_top_intalled[period].unique())
+
+d = device_top_intalled.dropna(subset=['trainrow'])
+Xtr_top_afternoon = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.afternoon)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled.dropna(subset=['testrow'])
+Xte_top_afternoon = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.afternoon)), 
+                      shape=(gatest.shape[0],napps))
+
+# breakfast
+
+period = 'breakfast'
+
+device_top_intalled = device_top_intalled_apps.dropna(subset=[period])
+
+device_top_intalled[period] = LabelEncoder().fit_transform(device_top_intalled[period])
+
+napps = len(device_top_intalled[period].unique())
+
+d = device_top_intalled.dropna(subset=['trainrow'])
+Xtr_top_breakfast = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.breakfast)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled.dropna(subset=['testrow'])
+Xte_top_breakfast = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.breakfast)), 
+                      shape=(gatest.shape[0],napps))
+
+# dawn
+
+period = 'dawn'
+
+device_top_intalled = device_top_intalled_apps.dropna(subset=[period])
+
+device_top_intalled[period] = LabelEncoder().fit_transform(device_top_intalled[period])
+
+napps = len(device_top_intalled[period].unique())
+
+d = device_top_intalled.dropna(subset=['trainrow'])
+Xtr_top_dawn = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.dawn)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled.dropna(subset=['testrow'])
+Xte_top_dawn = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.dawn)), 
+                      shape=(gatest.shape[0],napps))
+
+# dinner
+
+period = 'dinner'
+
+device_top_intalled = device_top_intalled_apps.dropna(subset=[period])
+
+device_top_intalled[period] = LabelEncoder().fit_transform(device_top_intalled[period])
+
+napps = len(device_top_intalled[period].unique())
+
+d = device_top_intalled.dropna(subset=['trainrow'])
+Xtr_top_dinner = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.dinner)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled.dropna(subset=['testrow'])
+Xte_top_dinner = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.dinner)), 
+                      shape=(gatest.shape[0],napps))
+
+
+# lunch
+
+period = 'lunch'
+
+device_top_intalled = device_top_intalled_apps.dropna(subset=[period])
+
+device_top_intalled[period] = LabelEncoder().fit_transform(device_top_intalled[period])
+
+napps = len(device_top_intalled[period].unique())
+
+d = device_top_intalled.dropna(subset=['trainrow'])
+Xtr_top_lunch = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.lunch)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled.dropna(subset=['testrow'])
+Xte_top_lunch = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.lunch)), 
+                      shape=(gatest.shape[0],napps))
+
+
+# morning
+
+period = 'morning'
+
+device_top_intalled = device_top_intalled_apps.dropna(subset=[period])
+
+device_top_intalled[period] = LabelEncoder().fit_transform(device_top_intalled[period])
+
+napps = len(device_top_intalled[period].unique())
+
+d = device_top_intalled.dropna(subset=['trainrow'])
+Xtr_top_morning = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.morning)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled.dropna(subset=['testrow'])
+Xte_top_morning = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.morning)), 
+                      shape=(gatest.shape[0],napps))
+
+
+# night
+
+period = 'night'
+
+device_top_intalled = device_top_intalled_apps.dropna(subset=[period])
+
+device_top_intalled[period] = LabelEncoder().fit_transform(device_top_intalled[period])
+
+napps = len(device_top_intalled[period].unique())
+
+d = device_top_intalled.dropna(subset=['trainrow'])
+Xtr_top_night = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.night)), 
+                      shape=(gatrain.shape[0],napps))
+                      
+d = device_top_intalled.dropna(subset=['testrow'])
+Xte_top_night = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.night)), 
+                      shape=(gatest.shape[0],napps))
+
+
 ####################################################### Concatenate All Features ####################################################### 
 
-Xtrain = hstack((Xtr_brand, Xtr_model, Xtr_app, Xtr_label, Xtr_top3_i, Xtr_top3_a, Xtr_top2_i, Xtr_top2_a), format='csr')
-Xtest =  hstack((Xte_brand, Xte_model, Xte_app, Xte_label,  Xte_top3_i, Xte_top3_a, Xte_top2_i, Xte_top2_a), format='csr')
+Xtrain = hstack((Xtr_brand, Xtr_model, Xtr_app, Xtr_label, Xtr_top_afternoon, Xtr_top_breakfast, Xtr_top_dawn, Xtr_top_dinner, Xtr_top_lunch, Xtr_top_morning, Xtr_top_night), format='csr')
+Xtest =  hstack((Xte_brand, Xte_model, Xte_app, Xte_label,  Xte_top_afternoon, Xte_top_breakfast, Xte_top_dawn, Xte_top_dinner, Xte_top_lunch, Xte_top_morning, Xte_top_night), format='csr')
 print('All features: train shape {}, test shape {}'.format(Xtrain.shape, Xtest.shape))
 
 ####################################################### Cross Validation ####################################################### 
@@ -189,54 +329,4 @@ pred.to_csv('logreg_subm_2.27332.csv',index=True)
 # mmwrite("file.mtx", Xtrain)
 
 
-device_top_intalled_apps = pd.read_csv('data_files_ready/device_top_apps_prediction_ready.csv', index_col = 'device_id', sep=';')
-
-device_top_intalled_apps = (device_top_intalled_apps.merge(gatrain[['trainrow']], how='left', left_index=True, right_index=True)
-                .merge(gatest[['testrow']], how='left', left_index=True, right_index=True)).reset_index()
-
-napps = len(device_top_intalled_apps['top_2_installed_apps'].unique())
-
-
-d = device_top_intalled_apps.dropna(subset=['trainrow'])
-Xtr_top2_i = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.top_2_installed_apps)), 
-                      shape=(gatrain.shape[0],napps))
                       
-d = device_top_intalled_apps.dropna(subset=['testrow'])
-Xte_top2_i = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.top_2_installed_apps)), 
-                      shape=(gatest.shape[0],napps))
-
-
-napps = len(device_top_intalled_apps['top_3_installed_apps'].unique())
-
-
-d = device_top_intalled_apps.dropna(subset=['trainrow'])
-Xtr_top3_i = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.top_3_installed_apps)), 
-                      shape=(gatrain.shape[0],napps))
-                      
-d = device_top_intalled_apps.dropna(subset=['testrow'])
-Xte_top3_i = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.top_3_installed_apps)), 
-                      shape=(gatest.shape[0],napps))
-
-
-napps = len(device_top_intalled_apps['top_2_active_apps'].unique())
-
-
-d = device_top_intalled_apps.dropna(subset=['trainrow'])
-Xtr_top2_a = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.top_2_active_apps)), 
-                      shape=(gatrain.shape[0],napps))
-                      
-d = device_top_intalled_apps.dropna(subset=['testrow'])
-Xte_top2_a = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.top_2_active_apps)), 
-                      shape=(gatest.shape[0],napps))
-
-
-napps = len(device_top_intalled_apps['top_3_active_apps'].unique())
-
-
-d = device_top_intalled_apps.dropna(subset=['trainrow'])
-Xtr_top3_a = csr_matrix((np.ones(d.shape[0]), (d.trainrow, d.top_3_active_apps)), 
-                      shape=(gatrain.shape[0],napps))
-                      
-d = device_top_intalled_apps.dropna(subset=['testrow'])
-Xte_top3_a = csr_matrix((np.ones(d.shape[0]), (d.testrow, d.top_3_active_apps)), 
-                      shape=(gatest.shape[0],napps))
